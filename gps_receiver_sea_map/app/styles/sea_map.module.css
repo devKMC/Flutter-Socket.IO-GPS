@@ -1,0 +1,13 @@
+.mapContainer {
+  position: absolute; /* 부모 요소 안에서 절대 위치 */
+  top: 0; /* 맵의 위치 설정 */
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 1;
+}
+
+.fullMap {
+  height: 100%;
+  width: 100%;
+}

@@ -1,0 +1,37 @@
+.operateLayerContainer {
+  position: absolute; /* 부모 요소 안에서 절대 위치 */
+  top: 0; /* 맵의 위치 설정 */
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  /* background-color: #0000005b; */
+  z-index: 2;
+  pointer-events: none;
+}
+
+.button {
+  position: relative;
+  padding: 10px 20px; /* 기본 패딩 */
+  font-size: 16px; /* 텍스트 크기 */
+  border: 2px solid #0070f3; /* 버튼 테두리 */
+  border-radius: 5px; /* 둥근 모서리 */
+  background-color: #0070f3; /* 배경색 */
+  color: white; /* 텍스트 색상 */
+  cursor: pointer;
+  transition: all 0.3s ease; /* 마우스 호버 시 애니메이션 효과 */
+  pointer-events: auto;
+}
+
+.button:hover {
+  background-color: #005bb5; /* 호버 시 배경색 변경 */
+  border-color: #005bb5; /* 호버 시 테두리 색 변경 */
+}
+
+.button:active {
+  transform: scale(0.95); /* 클릭 시 버튼이 살짝 줄어듦 */
+}
+
+.test {
+  top: 10px;
+  left: 100px;
+}
