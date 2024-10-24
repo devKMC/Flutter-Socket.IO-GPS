@@ -12,7 +12,7 @@ interface SerialPort {
 }
 
 // Serial 함수 컴포넌트
-const Serial = () => {
+const SerialHook = () => {
   const [port, setPort] = useState<SerialPort | null>(null); // 포트 상태를 타입으로 명시
   const [reader, setReader] = useState<ReadableStreamDefaultReader<string> | null>(null); // 포트 상태를 타입으로 명시
   const {
@@ -130,4 +130,4 @@ const Serial = () => {
   };
 };
 
-export default Serial;
+export default SerialHook;

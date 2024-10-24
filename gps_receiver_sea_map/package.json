@@ -15,7 +15,8 @@
     "react-dom": "^18",
     "react-leaflet": "^4.2.1",
     "socket.io": "^4.8.0",
-    "socket.io-client": "^4.8.0"
+    "socket.io-client": "^4.8.0",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.12",
@@ -24,6 +25,7 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "typescript": "^5"
   }
 }

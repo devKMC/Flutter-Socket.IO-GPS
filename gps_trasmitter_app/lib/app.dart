@@ -1,86 +1,50 @@
-import 'dart:async'; // Timer를 사용하기 위한 패키지
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart'; // Geolocator (위치 서비스용 패키지)
-import 'dart:convert'; // JSON 데이터를 인코딩/디코딩하기 위한 내장 라이브러리
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Riverpod 사용
 
-import 'socket_service.dart'; // 소켓 서비스 임포트
+import 'components/socket_service.dart'; // 소켓 서비스 임포트
+import 'providers/button_state_provider.dart';
+import 'providers/location_provider.dart';
+import 'components/location_service.dart';
 
-class LocationApp extends StatefulWidget {
+class LocationApp extends ConsumerStatefulWidget  {
   const LocationApp({super.key});
 
   @override
-  State<LocationApp> createState() => _LocationAppState();
+  ConsumerState<LocationApp> createState() => _LocationAppState();
 }
 
-class _LocationAppState extends State<LocationApp> {
-  Position? _currentPosition;
-  Timer? _timer;
-
-  final SocketService _socketService = SocketService();
+class _LocationAppState extends ConsumerState<LocationApp> {
+  late final LocationService _locationService = LocationService();
+  late final SocketService _socketService;
 
   @override
   void initState() {
     super.initState();
-    _startLocationUpdates(); // 타이머로 주기적 위치 업데이트
+    _socketService = SocketService(ref);
+    _locationService.initialize(ref, _socketService.sendLocation); 
     _socketService.initSocket();
+    _initializeAndStartLocationTracking();
   }
 
-  void _startLocationUpdates() {
-    // 0.3초마다 위치 정보를 가져오는 타이머 설정
-    _timer = Timer.periodic(const Duration(milliseconds: 1000), (Timer t) {
-      _getCurrentPosition(); // 0.3초마다 위치 가져오기 함수 호출
-    });
-  }
-
-  Future<void> _getCurrentPosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      print('위치 서비스가 비활성화되었습니다.');
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        print('위치 권한이 거부되었습니다.');
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      print('위치 권한이 영구적으로 거부되었습니다.');
-      return;
-    }
-
-    // 현재 위치 가져오기
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high, // 높은 정확도로 위치 요청
-    );
-
-    setState(() {
-      _currentPosition = position;
-    });
-
-    if (_currentPosition != null) {
-      final locationData = jsonEncode({
-        'latitude': _currentPosition!.latitude,
-        'longitude': _currentPosition!.longitude,
-      });
-    }
+  void _initializeAndStartLocationTracking() async {
+    await _locationService.startBackgroundLocation();
   }
 
   @override
   void dispose() {
-    _timer?.cancel(); // 타이머 종료
     super.dispose();
+    _locationService.stopBackgroundLocation();
   }
+
 
   @override
   Widget build(BuildContext context) {
+    final String isRequestEnabled = ref.watch(requestButtonEnabled);
+    final String isResponseEnabled = ref.watch(responseButtonEnabled);
+    final String isMonitorEnabled = ref.watch(monitorButtonEnabled);
+    final String? _latitude = ref.watch(latitude);
+    final String? _longitude = ref.watch(longitude);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('실시간 위치 업데이트'),
@@ -89,20 +53,30 @@ class _LocationAppState extends State<LocationApp> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _currentPosition != null
-            ? Text('위도: ${_currentPosition!.latitude}, 경도: ${_currentPosition!.longitude}')
-            : const Text('위치를 가져오는 중...'),
+            Text('위도: ${_latitude??'연결중'}, 경도: ${_longitude??'연결중'}'),
             ElevatedButton(
-              onPressed: _socketService.sendRequest, // 소켓 서비스 사용
-              child: Text('Send Request'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isRequestEnabled == 'setable' ? Colors.blue : isRequestEnabled == 'disable' ? Colors.grey : Colors.blue[300],
+                foregroundColor: isRequestEnabled == 'setable' ? Colors.white : isRequestEnabled == 'disable' ? Colors.black : Colors.white70,
+              ),
+              onPressed: isRequestEnabled == 'setable' ? _socketService.setMainClient : isRequestEnabled == 'disable' ? null : _socketService.removeMainClient,
+              child: const Text('Send Request'),
             ),
             ElevatedButton(
-              onPressed: _socketService.sendResponse, // 소켓 서비스 사용
-              child: Text('Send Response'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isResponseEnabled == 'setable' ? Colors.blue : isResponseEnabled == 'disable' ? Colors.grey : Colors.blue[300],
+                foregroundColor: isResponseEnabled == 'setable' ? Colors.white : isResponseEnabled == 'disable' ? Colors.black : Colors.white70,
+              ),
+              onPressed: isResponseEnabled == 'setable' ? _socketService.setSubClient : isResponseEnabled == 'disable' ? null : _socketService.removeSubClient,
+              child: const Text('Send Response'),
             ),
             ElevatedButton(
-              onPressed: _socketService.sendMonitor, // 소켓 서비스 사용
-              child: Text('Send Monitor'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isMonitorEnabled == 'setable' ? Colors.blue : isMonitorEnabled == 'disable' ? Colors.grey : Colors.blue[300],
+                foregroundColor: isMonitorEnabled == 'setable' ? Colors.white : isMonitorEnabled == 'disable' ? Colors.black : Colors.white70,
+              ),
+              onPressed: isMonitorEnabled == 'setable'? _socketService.sendMonitor : null, // 소켓 서비스 사용
+              child: const Text('Send Monitor'),
             ),
           ],
         )

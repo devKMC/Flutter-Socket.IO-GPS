@@ -9,29 +9,184 @@
   pointer-events: none;
 }
 
-.button {
-  position: relative;
-  padding: 10px 20px; /* 기본 패딩 */
-  font-size: 16px; /* 텍스트 크기 */
-  border: 2px solid #0070f3; /* 버튼 테두리 */
-  border-radius: 5px; /* 둥근 모서리 */
-  background-color: #0070f3; /* 배경색 */
-  color: white; /* 텍스트 색상 */
-  cursor: pointer;
-  transition: all 0.3s ease; /* 마우스 호버 시 애니메이션 효과 */
+.container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.6); /* 반투명 배경 */
+  border-radius: 10px;
+  padding: 12px;
+  overflow-y: auto; /* 세로 스크롤 가능 */
+  border: 2px solid rgba(255, 255, 255, 0.8); /* 흰색 테두리 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   pointer-events: auto;
 }
 
+.container::-webkit-scrollbar {
+  width: 8px; /* 스크롤바의 너비 */
+  height: 8px; /* 가로 스크롤바의 높이 */
+}
+
+/* 스크롤바 트랙 (배경) */
+.container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1); /* 트랙의 배경색 */
+  border-radius: 10px; /* 트랙을 둥글게 */
+}
+
+/* 스크롤바 핸들 */
+.container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5); /* 스크롤바 핸들의 색상 */
+  border-radius: 10px; /* 스크롤바 핸들을 둥글게 */
+  border: 2px solid transparent; /* 핸들의 안쪽에 여백을 주어 디자인을 향상 */
+}
+
+/* 스크롤바 핸들 - 마우스 오버 시 */
+.container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.7); /* 호버 시 핸들의 색상 변화 */
+}
+
+.fade {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+.hidden {
+  opacity: 0;
+  visibility: hidden; /* 요소가 안 보이게 됨 */
+}
+
+.textLog {
+  color: white;
+  font-family: "Courier New", Courier, monospace; /* 로그에 적합한 폰트 */
+  font-size: 14px;
+  white-space: pre-wrap; /* 자동 줄바꿈 */
+}
+
+.bottomRight {
+  width: 595px;
+  height: 200px; /* 적절한 높이 지정 */
+  bottom: 0;
+  right: 0;
+}
+
+.topLeft {
+  width: 430px;
+  height: 500px; /* 적절한 높이 지정 */
+  top: 70px;
+  left: 50px;
+}
+
+.button {
+  position: relative;
+  padding: 12px 30px;
+  font-size: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.8); /* 반투명 흰색 테두리 */
+  border-radius: 12px; /* 둥근 모서리 */
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명한 검은색 배경 */
+  color: rgba(255, 255, 255, 1); /* 불투명한 흰색 텍스트 */
+  font-weight: bold; /* 굵은 텍스트 */
+  cursor: pointer;
+  transition: all 0.3s ease; /* 부드러운 모든 요소의 변화 */
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 10px rgba(102, 204, 255, 0.5),
+    /* 밝은 파란색 */ 0 0 20px rgba(102, 204, 255, 0.5),
+    0 0 40px rgba(153, 255, 204, 0.5); /* 초록빛과 청록색 혼합 */
+}
+
+.downloadButton {
+  
+  margin: 15px 80px;
+  position: relative;
+  padding: 10px 18px;
+  font-size: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.8); /* 반투명 흰색 테두리 */
+  border-radius: 12px; /* 둥근 모서리 */
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명한 검은색 배경 */
+  color: rgba(255, 255, 255, 1); /* 불투명한 흰색 텍스트 */
+  font-weight: bold; /* 굵은 텍스트 */
+  cursor: pointer;
+  transition: all 0.3s ease; /* 부드러운 모든 요소의 변화 */
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 10px rgba(102, 204, 255, 0.5),
+    /* 밝은 파란색 */ 0 0 20px rgba(102, 204, 255, 0.5),
+    0 0 40px rgba(153, 255, 204, 0.5); /* 초록빛과 청록색 혼합 */
+}
+
 .button:hover {
-  background-color: #005bb5; /* 호버 시 배경색 변경 */
-  border-color: #005bb5; /* 호버 시 테두리 색 변경 */
+  background-color: rgba(0, 0, 0, 0.7); /* 호버 시 더 진한 배경 */
+  border-color: rgba(102, 204, 255, 1); /* 호버 시 파란 테두리 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 15px rgba(102, 204, 255, 1),
+    /* 더 강한 파란색 */ 0 0 30px rgba(102, 204, 255, 1),
+    0 0 60px rgba(153, 255, 204, 1); /* 더 강한 초록빛과 청록색 */
 }
 
 .button:active {
-  transform: scale(0.95); /* 클릭 시 버튼이 살짝 줄어듦 */
+  background-color: rgba(0, 0, 0, 0.6); /* 클릭 시 배경색 */
+  border-color: rgba(102, 204, 255, 0.8); /* 클릭 시 테두리 색 */
+  box-shadow: none; /* 클릭 시 그림자 제거 */
 }
 
-.test {
+.buttonTopLeft {
   top: 10px;
-  left: 100px;
+  left: 50px;
+  margin-right: 5px;
 }
+
+.onButton {
+  background-color: rgba(0, 0, 0, 0.7); 
+  border-color: rgba(102, 204, 255, 1); 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 15px rgba(102, 204, 255, 1),
+  0 0 30px rgba(102, 204, 255, 1),
+  0 0 60px rgba(153, 255, 204, 1); 
+}
+
+.selectContainer {
+  display: flex; /* 셀렉트 박스를 가로로 나란히 배치 */
+  flex-direction: row; /* 가로 방향으로 나열 */
+  margin-top: 10px; /* 버튼과의 간격 조정 */
+  pointer-events: auto; /* 사용자 상호작용 허용 */
+  margin-left: 490px;
+}
+
+.selectBox {
+  margin-top: 12px;
+  margin-right: 10px; /* 셀렉트 박스 간의 간격 조정 */
+  padding: 8px; /* 셀렉트 박스의 내부 여백 */
+  border: 2px solid rgba(255, 255, 255, 0.8); /* 셀렉트 박스 테두리 */
+  border-radius: 8px; /* 둥근 모서리 */
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명한 배경 */
+  color: rgba(255, 255, 255, 1); /* 텍스트 색상 */
+  font-size: 16px; /* 폰트 크기 조정 */
+  cursor: pointer; /* 커서 포인터로 변경 */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), 0 0 15px rgba(102, 204, 255, 1),
+  0 0 30px rgba(102, 204, 255, 1),
+  0 0 60px rgba(153, 255, 204, 1); 
+  width: 108px; /* 원하는 고정 너비 설정 */
+}
+
+.inforboxContainer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.infoBox {
+  align-items: center;
+  padding-left: 10px;
+  height: 40px;
+  border: 2px solid rgba(153, 189, 207, 0.8); 
+  border-radius: 8px; 
+  background-color: rgba(0, 0, 0, 0.5); 
+  color: white; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between; 
+  flex-grow: 1;
+}
+
+.SerialReportBox{
+  padding: 17px;
+}
+
+

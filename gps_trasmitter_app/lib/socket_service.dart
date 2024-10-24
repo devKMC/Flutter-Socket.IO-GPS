@@ -4,7 +4,10 @@ class SocketService {
   late IO.Socket _socket;
 
   // 소켓 초기화 및 서버 연결
-  void initSocket() {
+  void initSocket(
+    Function setRequestButtonEnabled, 
+    Function setResponseButtonEnabled, 
+    Function setMonitorButtonEnabled) {
     _socket = IO.io('http://192.168.0.34:3000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
@@ -13,21 +16,37 @@ class SocketService {
     _socket.connect();
 
     // 서버에 연결되었을 때
-    _socket.onConnect((_) {
-      print('Connected to the server');
-    });
+    _socket.on('registIdChange', (data) {
+      Map<String, dynamic> jsonData = data;
+      String mainClientId = jsonData['mainClientId'];
+      String subClientId = jsonData['subClientId'];
+      if (mainClientId.isEmpty){
+        setRequestButtonEnabled('setable');
+        setResponseButtonEnabled('disable');
+        setMonitorButtonEnabled('disable');
+      } else {
+        if (mainClientId == _socket.id){
+          setRequestButtonEnabled('removeable');
+          if (subClientId.isNotEmpty){
+            setMonitorButtonEnabled('setable');
+          }
+        } else {
+          setRequestButtonEnabled('disable');
+        }
 
-    // 서버로부터 받은 이벤트 처리
-    _socket.on('onRequest', (_) { // 이벤트 이름 수정
-      print('Request event received from the server');
-    });
+        if (subClientId.isEmpty){
+          setResponseButtonEnabled('setable');
+          setMonitorButtonEnabled('disable');
+        } else {
+          if (subClientId == _socket.id){
+            setResponseButtonEnabled('removeable');
+          } else {
+            setResponseButtonEnabled('disable');
+          }
+        }
+      }
+      
 
-    _socket.on('onResponse', (_) { // 이벤트 이름 수정
-      print('Response event received from the server');
-    });
-
-    _socket.on('onMonitor', (_) { // 이벤트 이름 수정
-      print('Monitor event received from the server');
     });
 
     // 연결이 끊어졌을 때
@@ -37,12 +56,20 @@ class SocketService {
   }
 
   // 서버에 이벤트 전송
-  void sendRequest() {
-    _socket.emit('request');
+  void setMainClient() {
+    _socket.emit('setMainClient');
   }
 
-  void sendResponse() {
-    _socket.emit('response');
+  void removeMainClient() {
+    _socket.emit('removeMainClient');
+  }
+
+  void setSubClient() {
+    _socket.emit('setSubClient');
+  }
+
+  void removeSubClient() {
+    _socket.emit('removeSubClient');
   }
 
   void sendMonitor() {
