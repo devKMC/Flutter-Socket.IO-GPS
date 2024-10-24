@@ -22,11 +22,11 @@ const GeolocateReport: FC<GeolocateReportProps> = ({ onInputSerialReport }) => {
         let reassembledStr = '';
 
         splitedStrArray.forEach((splitedStr) => {
-            const [timeStr, ...rest] = splitedStr.split(',');
+            const [id, timeStr, ...rest] = splitedStr.split(',');
             const currentRxLat = parseFloat(rest[2]); 
             const currentRxLon = parseFloat(rest[3]); 
 
-            const effectiveDistKim = (currentRxLat === 35.000000 && currentRxLon === 129.000000) ? 0 : distKim;
+            const effectiveDistKim = (currentRxLat === 35.000000 && currentRxLon === 129.000000) ? 0 : rest[4];
 
             const seconds = parseInt(timeStr) % 100;
             const minutes = Math.floor(parseInt(timeStr) / 100) % 100;
@@ -58,50 +58,64 @@ const GeolocateReport: FC<GeolocateReportProps> = ({ onInputSerialReport }) => {
     return (
         <div className={styles.operateLayerContainer}>
             <div className={`${styles.container} ${styles.topLeft} ${!onInputSerialReport ? styles.hidden : ''} ${styles.SerialReportBox}`}>
-                {myTime !== 0 && (
-                    <div className={styles.inforboxContainer}>
-                    <div style={{width:'110px',fontWeight:'bold'}}> 합정 세계시 </div>
-                    <div className={styles.infoBox}> {myTime}</div>
+                <div className={styles.inforboxContainer}>
+                    <div className={styles.ReportKey}> 합정 세계시 </div>
+                    <div className={styles.infoBox}> 
+                        {myTime && (
+                            `${myTime}`
+                        )}
                     </div>
-                )}
-                {myLat !== 0 && (
-                    <div className={styles.inforboxContainer}>
-                    <div style={{width:'110px',fontWeight:'bold'}}> 수신기 위도 </div>
-                    <div className={styles.infoBox}> {myLat.toFixed(6)}</div>
                 </div>
-                )}
-                {myLon !== 0 && (
-                    <div className={styles.inforboxContainer}>
-                        <div style={{width:'110px',fontWeight:'bold'}}> 수신기 경도 </div>
-                        <div className={styles.infoBox}> {myLon.toFixed(6)}</div>
+                <div className={styles.inforboxContainer}>
+                    <div className={styles.ReportKey}> 수신기 위도 </div>
+                        <div className={styles.infoBox}> 
+                            {myLat && (
+                                `${myLat.toFixed(6)}`
+                            )}
+                        </div>
                     </div>
-                )}
-                {rxLat !== 0 && (
-                    <div className={styles.inforboxContainer}>
-                        <div style={{width:'110px',fontWeight:'bold'}}> 송신기 위도 </div>
-                        <div className={styles.infoBox}>{rxLat.toFixed(6)}</div>
+                
+                <div className={styles.inforboxContainer}>
+                    <div className={styles.ReportKey}> 수신기 경도 </div>
+                    <div className={styles.infoBox}> 
+                    {myLon && (    
+                        `${myLon.toFixed(6)}`
+                    )}
                     </div>
-                )}
-                {rxLon !== 0 && ( 
+                </div>
                     <div className={styles.inforboxContainer}>
-                        <div style={{width:'110px',fontWeight:'bold'}}> 송신기 경도 </div>
-                        <div className={styles.infoBox}>{rxLon.toFixed(6)}</div>
+                        <div className={styles.ReportKey}> 송신기 위도 </div>
+                            <div className={styles.infoBox}>
+                                {rxLat && (
+                                    `${rxLat.toFixed(6)}`
+                                )}
+                            </div>
+                    </div>
+                    <div className={styles.inforboxContainer}>
+                        <div className={styles.ReportKey}> 송신기 경도 </div>
+                        <div className={styles.infoBox}>
+                            {rxLon && ( 
+                                `${rxLon.toFixed(6)}`
+                            )}
+                        </div>
                     </div>
 
-                )}
-                {myLat !== 0 && rxLat !== 0 && (
                     <div className={styles.inforboxContainer}>
-                        <div style={{width:'110px',fontWeight:'bold'}}>두 좌표간 거리</div>
-                        <div className={styles.infoBox}>{distKim} km</div>
+                        <div className={styles.ReportKey}>두 좌표간 거리</div>
+                        <div className={styles.infoBox}>
+                            {distKim && (
+                                `${distKim} km`
+                            )}
+                        </div>
                     </div>
-                )}
                 
-                {myLat !== 0 && rxLat !== 0 && (
-                        <button className={styles.downloadButton}  onClick={downloadRawData}>
-                            Data Download
-                        </button>
-                )}
                 
+                <button 
+                className={styles.downloadButton} 
+                onClick={() => rawData && (downloadRawData())}
+                >
+                    Data Download
+                </button>
             </div>
         </div>
     );

@@ -81,26 +81,28 @@ const SeaMapHook = () => {
         return null;
     };
     useEffect(()=> {
-        const latRight = myLat;
-        const lonRight = myLon + (radius / 111220) / Math.cos(myLat * Math.PI / 180);
-        setLine1([[myLat, myLon], [latRight, lonRight]]);
-    
-        const latFixed = rxLat;
-        const lonFixed = rxLon + (radius / 111220) / Math.cos(rxLat * Math.PI / 180);
-        setLine2([[rxLat, rxLon], [latFixed, lonFixed]]);
-
-        setMidPoint1([
-            (myLat + latRight) / 2,
-            (myLon + lonRight) / 2,
-        ]);
-    
-        setMidPoint2([
-            (rxLat + latFixed) / 2,
-            (rxLon + lonFixed) / 2,
-        ]);
-
-        const distance = calculateDistance(myLat, myLon, rxLat, rxLon);
-        setDistanceInKm((distance / 1000).toFixed(2));
+        if (myLat && myLon){
+            const latRight = myLat;
+            const lonRight = myLon + (radius / 111220) / Math.cos(myLat * Math.PI / 180);
+            setLine1([[myLat, myLon], [latRight, lonRight]]);
+            setMidPoint1([
+                (myLat + latRight) / 2,
+                (myLon + lonRight) / 2,
+            ]);
+        }
+        if (rxLat && rxLon){
+            const latFixed = rxLat;
+            const lonFixed = rxLon + (radius / 111220) / Math.cos(rxLat * Math.PI / 180);
+            setLine2([[rxLat, rxLon], [latFixed, lonFixed]]);
+            setMidPoint2([
+                (rxLat + latFixed) / 2,
+                (rxLon + lonFixed) / 2,
+            ]);
+        }
+        if (myLat && myLon && rxLat && rxLon){
+            const distance = calculateDistance(myLat, myLon, rxLat, rxLon);
+            setDistanceInKm((distance / 1000).toFixed(2));
+        }
     }, [myLat, myLon, rxLat, rxLon])
 
     return {

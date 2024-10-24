@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Riverpod 사용
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'components/socket_service.dart'; // 소켓 서비스 임포트
+import 'components/socket_service.dart';
 import 'providers/button_state_provider.dart';
 import 'providers/location_provider.dart';
 import 'components/location_service.dart';
+import 'components/custom_button.dart';
 
 class LocationApp extends ConsumerStatefulWidget  {
   const LocationApp({super.key});
@@ -36,7 +37,6 @@ class _LocationAppState extends ConsumerState<LocationApp> {
     _locationService.stopBackgroundLocation();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final String isRequestEnabled = ref.watch(requestButtonEnabled);
@@ -47,39 +47,101 @@ class _LocationAppState extends ConsumerState<LocationApp> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('실시간 위치 업데이트'),
+        title: const Text('실시간 위치 업데이트', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+        backgroundColor: Colors.teal[400],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('위도: ${_latitude??'연결중'}, 경도: ${_longitude??'연결중'}'),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isRequestEnabled == 'setable' ? Colors.blue : isRequestEnabled == 'disable' ? Colors.grey : Colors.blue[300],
-                foregroundColor: isRequestEnabled == 'setable' ? Colors.white : isRequestEnabled == 'disable' ? Colors.black : Colors.white70,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+
+              Container(
+                margin: const EdgeInsets.only(bottom: 30),
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.teal[50],
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+
+                    Column(
+                      children: [
+                        Icon(Icons.location_on, color: Colors.teal[400], size: 30),
+                        const SizedBox(height: 8),
+                        Text(
+                          '위도',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.teal[800],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _latitude ?? '연결중',
+                          style: const TextStyle(fontSize: 16, color: Colors.black87),
+                        ),
+                      ],
+                    ),
+
+                    Column(
+                      children: [
+                        Icon(Icons.location_on_outlined, color: Colors.teal[400], size: 30),
+                        const SizedBox(height: 8),
+                        Text(
+                          '경도',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.teal[800],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _longitude ?? '연결중',
+                          style: const TextStyle(fontSize: 16, color: Colors.black87),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              onPressed: isRequestEnabled == 'setable' ? _socketService.setMainClient : isRequestEnabled == 'disable' ? null : _socketService.removeMainClient,
-              child: const Text('Send Request'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isResponseEnabled == 'setable' ? Colors.blue : isResponseEnabled == 'disable' ? Colors.grey : Colors.blue[300],
-                foregroundColor: isResponseEnabled == 'setable' ? Colors.white : isResponseEnabled == 'disable' ? Colors.black : Colors.white70,
+
+              CustomButton(
+                label: 'Set Main Client',
+                enabledState: isRequestEnabled,
+                onSet: _socketService.setMainClient,
+                onRemove: _socketService.removeMainClient,
               ),
-              onPressed: isResponseEnabled == 'setable' ? _socketService.setSubClient : isResponseEnabled == 'disable' ? null : _socketService.removeSubClient,
-              child: const Text('Send Response'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isMonitorEnabled == 'setable' ? Colors.blue : isMonitorEnabled == 'disable' ? Colors.grey : Colors.blue[300],
-                foregroundColor: isMonitorEnabled == 'setable' ? Colors.white : isMonitorEnabled == 'disable' ? Colors.black : Colors.white70,
+              const SizedBox(height: 15),
+              CustomButton(
+                label: 'Set Sub Client',
+                enabledState: isResponseEnabled,
+                onSet: _socketService.setSubClient,
+                onRemove: _socketService.removeSubClient,
               ),
-              onPressed: isMonitorEnabled == 'setable'? _socketService.sendMonitor : null, // 소켓 서비스 사용
-              child: const Text('Send Monitor'),
-            ),
-          ],
-        )
+              const SizedBox(height: 15),
+              CustomButton(
+                label: 'Send Monitor',
+                enabledState: isMonitorEnabled,
+                onSet: _socketService.sendMonitor,
+                onRemove: _socketService.sendMonitorOff,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

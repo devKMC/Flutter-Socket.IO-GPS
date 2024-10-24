@@ -11,18 +11,15 @@ interface SerialPort {
   close: () => Promise<void>;
 }
 
-// Serial 함수 컴포넌트
 const SerialHook = () => {
-  const [port, setPort] = useState<SerialPort | null>(null); // 포트 상태를 타입으로 명시
-  const [reader, setReader] = useState<ReadableStreamDefaultReader<string> | null>(null); // 포트 상태를 타입으로 명시
+  const [port, setPort] = useState<SerialPort | null>(null); 
+  const [reader, setReader] = useState<ReadableStreamDefaultReader<string> | null>(null); 
   const {
     setRawData,
     setMyTime,
     setMyLat,
     setMyLon,
-    setRxLat,
-    setRxLon,
-    setDistKim 
+    serialDisconnect,
   } = DataStore();
   const { setOnConnectSerialPort } = OperateStore();
   
@@ -31,8 +28,8 @@ const SerialHook = () => {
   const connectPort = async () => {
     try {
       //@ts-ignore
-      const selectedPort: SerialPort = await navigator.serial.requestPort(); // 포트 요청
-      await selectedPort.open({ baudRate: 115200 }); // 포트 열기
+      const selectedPort: SerialPort = await navigator.serial.requestPort(); 
+      await selectedPort.open({ baudRate: 115200 }); 
       setPort(selectedPort);
 
       const textDecoder = new TextDecoderStream();
@@ -42,7 +39,7 @@ const SerialHook = () => {
       const readerInstance = textDecoder.readable.getReader();
       setReader(readerInstance)
       setOnConnectSerialPort(true);
-      // 데이터를 읽는 루프
+      
       while (true) {
         const { value, done } = await readerInstance.read();
         if (done) {
@@ -51,16 +48,16 @@ const SerialHook = () => {
         }
 
         if (value) {
-          buffer += value; // 데이터를 버퍼에 누적
+          buffer += value; 
           while (buffer.includes("\r\n")) {
             const packetEnd = buffer.indexOf("\r\n");
-            const packet = buffer.slice(0, packetEnd); // \r\n 이전까지의 패킷 추출
-            buffer = buffer.slice(packetEnd + 2); // 처리한 패킷을 버퍼에서 제거
-            processPacket(packet); // 패킷 처리 함수 호출
+            const packet = buffer.slice(0, packetEnd); 
+            buffer = buffer.slice(packetEnd + 2); 
+            processPacket(packet); 
           }
         }
       }
-      // 스트림이 닫힌 후 처리
+      
       await readableStreamClosed;
       setOnConnectSerialPort(false);
       console.log("Readable stream successfully closed");
@@ -78,43 +75,31 @@ const SerialHook = () => {
         const myLon = parseFloat(splitValue[3]);
         const rxLat = parseFloat(splitValue[4]);
         const rxLon = parseFloat(splitValue[5]);
-        const distance = parseFloat(splitValue[6]);
-
-
-
-          if (rxLat === 35.000000 && rxLon === 129.000000) { 
-              setDistKim(0); 
-          } else if (!isNaN(distance)) {
-              setDistKim(distance);
-          }
-      
 
       if (!isNaN(time) && !isNaN(myLat) && !isNaN(myLon) && !isNaN(rxLat) && !isNaN(rxLon)) {
         setRawData(packet); 
         setMyTime(time);
         setMyLat(myLat);
         setMyLon(myLon);
-        setRxLat(rxLat);
-        setRxLon(rxLon);
-
       } 
     } 
   };
 
   const disconnectPort = async () => {
     try {
-      if (port) { // 포트가 연결된 경우에만 수행
+      if (port) { 
         if (reader) {
-          await reader.cancel(); // 먼저 리더를 취소하여 스트림 해제
-          reader.releaseLock(); // 락 해제
+          await reader.cancel(); 
+          reader.releaseLock(); 
           setReader(null)
           while (port.readable.locked) {
-            await new Promise(resolve => setTimeout(resolve, 100)); // 잠시 대기 후 다시 확인
+            await new Promise(resolve => setTimeout(resolve, 100)); 
           }
-        } // 먼저 리더 락 해제
-        await port.close(); // 포트 닫기
-        setPort(null) // 포트 상태 초기화
-        setOnConnectSerialPort(false); // 연결 상태 false로 설정
+        } 
+        await port.close(); 
+        setPort(null) 
+        setOnConnectSerialPort(false); 
+        serialDisconnect();
       } else {
         console.log("No port is currently connected");
       }

@@ -42,6 +42,7 @@ class SocketService {
       Map<String, dynamic> jsonData = data;
       String mainClientId = jsonData['mainClientId'];
       String subClientId = jsonData['subClientId'];
+      bool onMonitor = jsonData['onMonitor'];
       if (mainClientId.isEmpty){
         ref.read(requestButtonEnabled.notifier).state = 'setable';
         ref.read(responseButtonEnabled.notifier).state = 'disable';
@@ -50,7 +51,11 @@ class SocketService {
         if (mainClientId == platformId){
           ref.read(requestButtonEnabled.notifier).state = 'removeable';
           if (subClientId.isNotEmpty){
-            ref.read(monitorButtonEnabled.notifier).state = 'setable';
+            if (onMonitor) {
+              ref.read(monitorButtonEnabled.notifier).state = 'removeable';
+            } else {
+              ref.read(monitorButtonEnabled.notifier).state = 'setable';
+            }
           }
         } else {
           ref.read(requestButtonEnabled.notifier).state = 'disable';
@@ -98,10 +103,15 @@ class SocketService {
     _socket.emit('monitor');
   }
 
+  void sendMonitorOff() {
+    _socket.emit('monitorOff');
+  }
+
   void sendLocation(dynamic locationData) async {
     locationData['platformId'] = platformId;
     _socket.emit('setLocation', locationData);
   }
+
 
   // 소켓 연결 해제
   void disconnect() {

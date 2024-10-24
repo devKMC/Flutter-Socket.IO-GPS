@@ -11,14 +11,17 @@ import SocketService from "../hooks/socket_hook"
 
 
 const OperateLayer = () => {
-    const { connectPort, disconnectPort, port } = SerialHook();
     const containerRef = useRef<HTMLDivElement>(null);
-    const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+    
     const { rawData, myLat, myLon, rxLat, rxLon, distKim } = DataStore(); 
     const { onConnectSerialPort, onInputSerialReport, moveDestination,setOnInputSerialReport, setMoveDestination } = OperateStore();
     
     const [showSelectBoxes, setShowSelectBoxes] = useState<boolean>(false);
+    const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+
+    const { connectPort, disconnectPort, port } = SerialHook();
     SocketService()
+    
     const handleScroll = () => {
         if (containerRef.current) {
             const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
@@ -40,42 +43,20 @@ const OperateLayer = () => {
         }
     };
 
-    const handleInputSerialReport = (isReportEnabled: boolean) => {
-        setOnInputSerialReport(!onInputSerialReport); 
-        if (!isReportEnabled) { 
-            const dataArray = rawData.split(',');
-            dataArray.forEach(data => {
-                const [key, value] = data.split(':');
-                if (key === 'lat') {
-                    DataStore.getState().setMyLat(parseFloat(value)); 
-                } else if (key === 'myTime') {
-                    DataStore.getState().setMyTime(parseInt(value)); 
-                } else if (key === 'lng') {
-                    DataStore.getState().setMyLon(parseFloat(value)); 
-                } else if (key === 'rxLat') {
-                    DataStore.getState().setRxLat(parseFloat(value));
-                } else if (key === 'rxLon') { 
-                    DataStore.getState().setRxLon(parseFloat(value));
-                } else if (key === 'distKim') {
-                    DataStore.getState().setDistKim(parseFloat(value));
-                }
-            });
-        }
-    };
-
     const moveMapTo = (lat: number, lon: number) => {
         setMoveDestination({lat, lon})
     };
 
-    const handleMoveToReceiver = () => {
-        if(rxLat === 35.000000 && rxLon === 129.00000) {
-            return;
+    const handleMoveToTransmitter = () => {
+        if(rxLat && rxLon) {
+            moveMapTo(rxLat, rxLon);
         }
-        moveMapTo(rxLat, rxLon);
     };
 
-    const handleMoveToTransmitter = () => {
-        moveMapTo(myLat, myLon);
+    const handleMoveToReceiver = () => {
+        if(myLat && myLon) {
+            moveMapTo(myLat, myLon);
+        }
     };
 
     const toggleSelectBoxes = () => {
@@ -91,7 +72,7 @@ const OperateLayer = () => {
             </button>
             <button 
                 className={`${styles.button} ${styles.buttonTopLeft} ${onInputSerialReport && styles.onButton}`} 
-                onClick={() => handleInputSerialReport(!onInputSerialReport)}>
+                onClick={() => setOnInputSerialReport(!onInputSerialReport)}>
                 Input Serial Report
             </button>
             <button 

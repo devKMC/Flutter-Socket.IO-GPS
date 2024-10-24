@@ -13,6 +13,7 @@ var mainClientId = ''
 var subClientId = ''
 var latitude = null
 var longitude = null
+var onMonitor = false
 
 app.prepare().then(() => {
   const httpServer = createServer(handler);
@@ -22,80 +23,102 @@ app.prepare().then(() => {
 
     socket.emit('registIdChange', {
       mainClientId,
-      subClientId
+      subClientId,
+      onMonitor,
     })
 
     socket.on('setPlatformId', (data) => {
       const { platformId } = data;
       socket.platformId = platformId;
-      console.log(`클라이언트 연결됨 굿 ㅋㅋ: ${platformId}`)
+      console.log(`mobile client connect! ID: ${platformId}`)
     })
-
 
     socket.on('setMainClient', () => {
       mainClientId = socket.platformId
-      console.log('메인 클라 어서오고 ㅋㅋ', mainClientId, subClientId)
+      console.log('set main client [', mainClientId, subClientId, ']')
       io.emit('registIdChange', {
         mainClientId,
-        subClientId
+        subClientId,
+        onMonitor,
       })
     })
 
     socket.on('removeMainClient', () => {
       latitude = null
       longitude = null
+      onMonitor = false;
       mainClientId = ''
       subClientId = ''
-      console.log('메인 클라 퇴갤 ㅋㅋ', mainClientId, subClientId)
+      console.log('remove main client [', mainClientId, subClientId, ']')
       io.emit('registIdChange', {
         mainClientId,
-        subClientId
+        subClientId,
+        onMonitor,
       })
     })
 
     socket.on('setSubClient', () => {
       subClientId = socket.platformId
-      console.log('서브 클라 어서오고 ㅋㅋ', mainClientId, subClientId)
+      console.log('set sub client [', mainClientId, subClientId, ']')
       io.emit('registIdChange', {
         mainClientId,
-        subClientId
+        subClientId,
+        onMonitor,
       })
     })
 
     socket.on('removeSubClient', () => {
       latitude = null
       longitude = null
+      onMonitor = false;
       subClientId = ''
-      console.log('서브 클라 퇴갤 ㅋㅋ', mainClientId, subClientId)
+      console.log('remove sub client [', mainClientId, subClientId, ']')
       io.emit('registIdChange', {
         mainClientId,
-        subClientId
+        subClientId,
+        onMonitor,
       })
     })
 
     socket.on('monitor', () => {
+      onMonitor = true;
+      io.emit('registIdChange', {
+        mainClientId,
+        subClientId,
+        onMonitor,
+      })
       const interval = setInterval(() => {
-        if (latitude===null | longitude===null) {
+        if ((latitude===null && longitude===null) || !onMonitor) {
           clearInterval(interval)
           io.to('webClient').emit('removeMobileLocate')
-          console.log('interval 죽음')
+          console.log('mobile gps monitor on')
           return;
         }
-        lat = parseFloat(latitude).toFixed(6); + generateRandom()
-        lon = parseFloat(longitude).toFixed(6); + generateRandom()
+        lat = (parseFloat(latitude) + generateRandom()).toFixed(6); 
+        lon = (parseFloat(longitude) + generateRandom()).toFixed(6);
         io.to('webClient').emit('getMobileLocate', {latitude: `${lat}`, longitude: `${lon}`})
         console.log(`${lat}, ${lon}`)
       }, 1000)
-      
+    })
+
+    socket.on('monitorOff', () => {
+      onMonitor = false;
+      io.emit('registIdChange', {
+        mainClientId,
+        subClientId,
+        onMonitor,
+      })
+      console.log('mobile gps monitor off')
     })
 
     const generateRandom = () => {
-      randomValue = (Math.random() * 0.000001) - 0.0000005;
+      randomValue = (Math.random() * 0.000006) - 0.000003;
       return randomValue;
     }
 
     socket.on('joinWebClient', () => {
       socket.join('webClient')
+      console.log(`mobile client connect! ID: ${socket.id}`)
     })
 
     socket.on('setLocation', (data) => {
@@ -107,7 +130,7 @@ app.prepare().then(() => {
     })
 
     socket.on('disconnect', () => {
-      console.log(`클라이언트 퇴갤 ㅋㅋ: ${socket.platformId}`)
+      console.log(`client disconnect: ${socket.platformId || socket.id}`)
     })
   });
 

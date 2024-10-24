@@ -68,7 +68,7 @@ function SeaMap() {
                 {myLat && myLon && !isNaN(myLat) && !isNaN(myLon) && (
                     <>
                         {/*----------- 거리 선 -----------*/}
-                        {rxLat !== 35.000000 && rxLon !== 129.000000 && (
+                        {rxLat  && rxLon  && (
                         <Polyline
                             positions={[[myLat, myLon], [rxLat, rxLon]]}
                             color="#192880"
@@ -91,7 +91,7 @@ function SeaMap() {
                                     }}
                                     pane='radiusPane'
                                 />
-                                {rxLat !== 35.000000 && rxLon !== 129.000000 && (
+                                {rxLat && rxLon && (
                                 <Circle
                                     weight={1.3}
                                     center={[rxLat, rxLon]}
@@ -133,7 +133,7 @@ function SeaMap() {
                                             iconSize: [100, 40]
                                         })}
                                     />
-                                    {rxLat !== 35.000000 && rxLon !== 129.000000 && (
+                                    {rxLat && rxLon && (
                                     <>
                                         <Marker
                                             position={midPoint2}
@@ -171,7 +171,7 @@ function SeaMap() {
                                 pane='coordPane'
 
                             />
-                            {rxLat !== 35.000000 && rxLon !== 129.000000 && (
+                            {rxLat && rxLon && (
                             <CircleMarker
                                 weight={1}
                                 center={[rxLat, rxLon]}

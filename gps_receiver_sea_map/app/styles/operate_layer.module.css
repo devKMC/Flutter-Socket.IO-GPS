@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
 .operateLayerContainer {
   position: absolute; /* 부모 요소 안에서 절대 위치 */
   top: 0; /* 맵의 위치 설정 */
@@ -174,10 +176,12 @@
 .infoBox {
   align-items: center;
   padding-left: 10px;
+  margin-left: 10px;
   height: 40px;
   border: 2px solid rgba(153, 189, 207, 0.8); 
   border-radius: 8px; 
   background-color: rgba(0, 0, 0, 0.5); 
+    font-family: 'Noto Sans KR', sans-serif;
   color: white; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -189,4 +193,10 @@
   padding: 17px;
 }
 
+.ReportKey{
+  width: 110px;
+  font-weight: bold;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: white
+}
 
